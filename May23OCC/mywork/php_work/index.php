@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="en">
 <head>
     <link rel="stylesheet" href="styles.css">
     <title>Health Advice Group</title>
