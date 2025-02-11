@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../admin/styles.css">
     <title>signup</title>
 </head>
 <body>
@@ -12,13 +12,13 @@
 <p>
     Welcome to the sign up page
 </p>
-<form method="post" action="" class="textinput"> <!-- creates a form for the user to be able to sign up easily -->
+<form method="post" action="" > <!-- creates a form for the user to be able to sign up easily -->
     <input type="text" name="email" placeholder="Please Enter your email"><br><br>
     <input type="text" name="password" placeholder="Please Enter your password"><br>
     <select name="utype">
-        <option value="consumer">Consumer</option>
-        <option value="commercial">Commercial</option>
-        <option value="education">Education</option>
+        <option value="1">Consumer</option>
+        <option value="2">Commercial</option>
+        <option value="3">Education</option>
     </select><br><br>
     <input type="submit" value="Sign Up">
 </form>
@@ -27,7 +27,7 @@
 
 <?php
 
-include 'db_connect.php';
+include '../db_connect.php';
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') { //checks when anything is submitted from the form
@@ -82,16 +82,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { //checks when anything is submitted 
                 $epoch = time();
 
 
-                $sql = "INSERT INTO user (email, password, signup_date) VALUES (?, ?, ?)";
+                $sql = "INSERT INTO user (email, password, signup_date, utype_id) VALUES (?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(1,$email);
                 $stmt->bindParam(2,$hpswd);
                 $stmt->bindParam(3,$epoch);
+                $stmt->bindParam(4,$utype);
 
                 $stmt->execute();
-                header("refresh:5; url=profile.php");
-                echo '<br>';
-                echo "Successfully registered";
+
+                header("Location: profile.php");
             } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
             }
