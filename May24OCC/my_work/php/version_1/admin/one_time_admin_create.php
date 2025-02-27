@@ -21,65 +21,80 @@
 
 include '../db_connect.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Only access $_POST after the form has been submitted
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $fname = $_POST['fname'] ?? '';
-    $sname = $_POST['sname'] ?? '';
-    $time = time();
-    $privl = $_POST['priv'] ?? '';
+try {
+    // Check if super admin exists by looking for a user with "SUPER" privilege
+    $sql = "SELECT admin_user_id FROM `admin_users` WHERE privl = 'SUPER' LIMIT 1";  // Correct column name used
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Check if email is empty
-    if (empty($email)) {
-        $nameErr = "Email is required";
-        header("refresh:2; url=signup.php");
-        echo $nameErr;
-    }
-    // Check if email is a valid format
-    elseif (strpos($email,'@') === false || strpos($email,'.') === false) {
-        $nameErr = "Invalid email format";
-        header("refresh:2; url=signup.php");
-        echo $nameErr;
-    }
-    // Check if password is empty
-    elseif (empty($password)) {
-        $nameErr = "Password is required";
-        header("refresh:2; url=signup.php");
-        echo $nameErr;
-    }
-    // Check password length and strength using regex
-    elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\W).{8,}$/', $password)) {
-        $nameErr = "Password must be at least 8 characters long, with at least one uppercase letter, one lowercase letter, and one special character.";
-        header("refresh:2; url=signup.php");
-        echo $nameErr;
-    }
-    elseif (empty($fname)) {
-        $nameErr = "First name is required";
-        header("refresh:2; url=signup.php");
-    }
-    elseif (empty($sname)) {
-        $nameErr = "Surname is required";
-        header("refresh:2; url=signup.php");
-    }
-    else {
-        echo "You have been registered successfully";
+    // If super admin already exists, redirect to another page or show a message
+    if ($result) {
+        echo 'SUPER ADMIN user already exists';
+        header("Location: admin_profile.php");  // Redirect to a page that informs the user signup is closed
+        exit();
     }
 
-    try {
-        $sql = "SELECT email FROM `admin_users` WHERE email = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(1,$email);
-        $stmt->execute();
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // Only access $_POST after the form has been submitted
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $fname = $_POST['fname'] ?? '';
+        $sname = $_POST['sname'] ?? '';
+        $time = time();
+        $privl = $_POST['priv'] ?? '';
 
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Check if email is empty
+        if (empty($email)) {
+            $nameErr = "Email is required";
+            header("refresh:2; url=signup.php");
+            echo $nameErr;
+        }
+        // Check if email is a valid format
+        elseif (strpos($email,'@') === false || strpos($email,'.') === false) {
+            $nameErr = "Invalid email format";
+            header("refresh:2; url=signup.php");
+            echo $nameErr;
+        }
+        // Check if password is empty
+        elseif (empty($password)) {
+            $nameErr = "Password is required";
+            header("refresh:2; url=signup.php");
+            echo $nameErr;
+        }
+        // Check password length and strength using regex
+        elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\W).{8,}$/', $password)) {
+            $nameErr = "Password must be at least 8 characters long, with at least one uppercase letter, one lowercase letter, and one special character.";
+            header("refresh:2; url=signup.php");
+            echo $nameErr;
+        }
+        elseif (empty($fname)) {
+            $nameErr = "First name is required";
+            header("refresh:2; url=signup.php");
+        }
+        elseif (empty($sname)) {
+            $nameErr = "Surname is required";
+            header("refresh:2; url=signup.php");
+        }
+        else {
+            echo "You have been registered successfully";
+        }
 
-        if ($result) {
-            header("refresh:5; url=create_user_form.php");
-            echo '<br>';
-            echo "An Account with this email already exists. Try again!";
-        } else {
-            try {
+        try {
+            // Check if the email already exists in the database
+            $sql = "SELECT email FROM `admin_users` WHERE email = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(1, $email);
+            $stmt->execute();
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($result) {
+                header("refresh:5; url=login.php");
+                echo '<br>';
+                echo "An Account with this email already exists. Try again!";
+            } else {
+                // Insert the new admin user as super admin
                 $hpswd = password_hash($password, PASSWORD_DEFAULT);
                 $epoch = time();
 
@@ -94,15 +109,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 $stmt->execute();
 
-                header("Location: admin_profile.php");  // Redirect to profile page after registration
+                // Redirect to profile page after registration
+                header("Location: admin_profile.php");
                 exit();  // Stop further script execution
-            } catch (PDOException $e) {
-                echo "Error: " . $e->getMessage();
             }
+        } catch (PDOException $e) {
+            // Handle any errors that occur within the database queries
+            echo "Error during database operation: " . $e->getMessage();
         }
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
     }
+} catch (PDOException $e) {
+    // Handle connection or other exceptions
+    echo "Error: " . $e->getMessage();
 }
 ?>
-
