@@ -3,7 +3,6 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 27, 2025 at 09:16 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -265,7 +264,6 @@ ALTER TABLE `visits`
 -- AUTO_INCREMENT for table `admin_users`
 --
 ALTER TABLE `admin_users`
-  MODIFY `admin_user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `hotel_booking`
