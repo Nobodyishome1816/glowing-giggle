@@ -23,3 +23,12 @@ body {
 #nav a:hover {
     background-color: #ddd; /* Change background color when hovering */
 }
+
+#title {
+    display: flex;
+    align-items: center;
+}
+
+img {
+    width: 5%;
+}

@@ -1,13 +1,14 @@
 <?php
 session_start();
 
-require_once 'db_connect.php';
+
 require_once 'common_functions.php';
+require_once 'db_connect.php';
 
 if (isset($_SESSION['user_ssnlogin'])){
     $_SESSION['ERROR'] = "You are already logged in!";
     header("Location: index.php");
-    exit; // Stop further execution
+    exit;
 }
 
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST'){  // if superuser doesn't exist and posted to this page
