@@ -12,6 +12,8 @@ echo "<a href='user_login.php'>Login</a>";
 
 echo "<a href='loggout.php'>Log out</a>";
 
+echo "<a href='testing.php'>Testing</a>";
+
 echo "</ul>";
 
 echo "</div>";
