@@ -2,3 +2,24 @@ body {
     background: #bf9626;
     font-family: Arial, Calibri, sans-serif;
 }
+#nav ul {
+    list-style-type: none;  /* Remove bullets */
+    padding: 0;             /* Remove default padding */
+    display: flex;
+}
+
+#nav li {
+    margin-bottom: 15px;
+}
+
+#nav a {
+    color: #000;            /* Set link color */
+    display: block;         /* Make links block-level so they take up the full width of the list item */
+    padding: 10px;          /* Add padding inside the links for better spacing */
+    border-radius: 5px;     /* Optional: Rounded corners for the background */
+    border: solid black 1px/* Add space between list items */
+}
+
+#nav a:hover {
+    background-color: #ddd; /* Change background color when hovering */
+}
