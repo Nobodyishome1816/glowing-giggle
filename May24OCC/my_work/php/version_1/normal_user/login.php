@@ -14,9 +14,10 @@
 </body>
 </html>
 <?php
-    include '../db_connect.php';
+session_start();
+include '../db_connect.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') { //checks when anything is submitted from the form
+if ($_SERVER['REQUEST_METHOD'] == 'POST') { // Checks when the form is submitted
     // Only access $_POST after the form has been submitted
     $email = $_POST['email'] ?? '';  // Default to an empty string if 'email' is not set
     $password = $_POST['password'] ?? '';  // Default to an empty string if 'password' is not set
@@ -24,25 +25,63 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') { //checks when anything is submitted 
     // Check if email is empty
     if (empty($email)) {
         $nameErr = "Email is required";
-        header("refresh:2; url=signup.php");
         echo $nameErr;
-    } // Check if email is a valid format
-    elseif (strpos($email, '@') === false || strpos($email, '.') === false) { //strpos returns true or false when checking the email, if there is no @ or . then it returns false
-        $nameErr = "Invalid email format";
         header("refresh:2; url=signup.php");
-        echo $nameErr; // shows error if there is one
-    } // Check if password is empty
+        exit();
+    }
+    // Check if email is a valid format
+    elseif (strpos($email, '@') === false || strpos($email, '.') === false) {
+        $nameErr = "Invalid email format";
+        echo $nameErr;
+        header("refresh:2; url=signup.php");
+        exit();
+    }
+    // Check if password is empty
     elseif (empty($password)) {
         $nameErr = "Password is required";
+        echo $nameErr;
         header("refresh:2; url=signup.php");
-        echo $nameErr; // shows error is there is one
-    } // Check password length and strength using regex
-    elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\W).{8,}$/', $password)) { // chosen to make sure the password has at least 1 Cap letter, 1 lower letter, 1 Special character and 8 or more characters for good security
+        exit();
+    }
+    // Check password length and strength using regex
+    elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\W).{8,}$/', $password)) {
         $nameErr = "Password must be at least 8 characters long, with at least one uppercase letter, one lowercase letter, and one special character.";
+        echo $nameErr;
         header("refresh:2; url=signup.php");
-        echo $nameErr; // shows error if there is one
-    } else {
-        echo "You have been registered successfully";
+        exit();
+    }
+
+    try {
+        // Prepare SQL statement to fetch the user from the database
+        $sql = "SELECT * FROM `user` WHERE email = :email";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);  // Fetch user data
+
+        // If user exists and password matches
+        if ($user && password_verify($password, $user['password'])) {
+            // Store user information in session variables
+            $_SESSION['admin_user_id'] = $user['admin_user_id'];  // Store user ID
+            $_SESSION['email'] = $user['email'];  // Store user email
+            $_SESSION['f_name'] = $user['f_name'];  // Store first name
+            $_SESSION['s_name'] = $user['s_name'];  // Store surname
+            $_SESSION['privl'] = $user['privl'];  // Store privilege level
+
+            // Redirect to profile page
+            header("Location: profile.php");
+            exit();
+        } else {
+            // If credentials are incorrect
+            $nameErr = "Invalid email or password.";
+            echo $nameErr;
+            header("refresh:2; url=login.php");  // Redirect back to login page
+            exit();
+        }
+    } catch (PDOException $e) {
+        // If there is an error in the database connection or query
+        echo "Error: " . $e->getMessage();
     }
 }
 ?>

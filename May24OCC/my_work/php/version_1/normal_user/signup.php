@@ -13,6 +13,8 @@
     Welcome to the sign up page
 </p>
 <form method="post" action="" > <!-- creates a form for the user to be able to sign up easily -->
+    <input type="text" name="fname" placeholder="please enter your first name"><br><br>
+    <input type="text" name="sname" placeholder="please enter your surname"><br><br>
     <input type="text" name="email" placeholder="Please Enter your email"><br><br>
     <input type="text" name="password" placeholder="Please Enter your password"><br>
     <select name="utype">
