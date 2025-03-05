@@ -15,9 +15,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $ticket_date = $_POST['ticket_date'];  // Date selected by the user
         $ticket_epoch_time = strtotime($ticket_date);  // Convert the date to epoch time
 
+        $conn = db_connect();
+        $sql = "SELECT ticket_id FROM tickets WHERE ticket_type = ? ";
+        $stmt = $conn->prepare($sql);
+
+
         $date_booked = time();
         // Prepare and execute the SQL query
-        $conn = db_connect();
         $sql = "INSERT INTO ticket_booking (date_booked, ticket_date) VALUES (?, ?)";  // Prepare SQL query to insert
         $stmt = $conn->prepare($sql);  // Prepare statement
 
