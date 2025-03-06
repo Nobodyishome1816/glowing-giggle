@@ -18,7 +18,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $conn = db_connect();
         $sql = "SELECT ticket_id FROM tickets WHERE ticket_type = ? ";
         $stmt = $conn->prepare($sql);
-
+    
 
         $date_booked = time();
         // Prepare and execute the SQL query
